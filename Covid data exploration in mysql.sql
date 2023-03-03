@@ -47,44 +47,45 @@ SELECT * FROM project_portfolio.covid_vaccinations limit 1000000000
 -- Shows Percentage of Population that has recieved at least one Covid Vaccine
 
 select t.*, round(t.PeopleVaccinated*100/t.population,2) as perc_population_vaccinated from 
-(SELECT cv.location, cd.population, max(cv.people_vaccinated) as
-PeopleVaccinated
- FROM project_portfolio.covid_vaccinations cv join project_portfolio.covid_deaths cd on cv.date= cd.date and cv.location= cd.location
- group by cv.location, cd.population)t
- order by 1,2
+( SELECT cv.location, cd.population, max(cv.people_vaccinated) as
+  PeopleVaccinated
+  FROM project_portfolio.covid_vaccinations cv join project_portfolio.covid_deaths cd on cv.date= cd.date and cv.location= cd.location
+  group by cv.location, cd.population) t
+order by 1,2
 
 -- Using CTE to perform Calculation in previous query
 
 with PopvsVac AS(
-SELECT cv.location, cd.population, max(cv.people_vaccinated) as
-PeopleVaccinated
+ SELECT cv.location, cd.population, max(cv.people_vaccinated) as
+ PeopleVaccinated
  FROM project_portfolio.covid_vaccinations cv join project_portfolio.covid_deaths cd on cv.date= cd.date and cv.location= cd.location
  group by cv.location, cd.population
  order by 1,2)
- select PopvsVac.*,round(PeopleVaccinated*100/population,2) as perc_population_vaccinated from PopvsVac
+select PopvsVac.*,round(PeopleVaccinated*100/population,2) as perc_population_vaccinated from PopvsVac
  
  
--- Using Temp Table to perform Calculation on Partition By in previous query
+-- Using Temp Table to perform Calculation in previous query
 
 create temporary table if not exists temp_table
 with PopvsVac AS(
-SELECT cv.location, cd.population, max(cv.people_vaccinated) as
-PeopleVaccinated
+ SELECT cv.location, cd.population, max(cv.people_vaccinated) as
+ PeopleVaccinated
  FROM project_portfolio.covid_vaccinations cv join project_portfolio.covid_deaths cd on cv.date= cd.date and cv.location= cd.location
  group by cv.location, cd.population
  order by 1,2)
- select PopvsVac.*,round(PeopleVaccinated*100/population,2) as perc_population_vaccinated from PopvsVac
+select PopvsVac.*,round(PeopleVaccinated*100/population,2) as perc_population_vaccinated from PopvsVac
 
 select * from temp_table
 
 -- Creating View to store data for later visualizations
+
 create view project_portfolio.PercentPopulationVaccinated as
 select t.*, round(t.PeopleVaccinated*100/t.population,2) as perc_population_vaccinated from 
-(SELECT cv.location, cd.population, max(cv.people_vaccinated) as
-PeopleVaccinated
- FROM project_portfolio.covid_vaccinations cv join project_portfolio.covid_deaths cd on cv.date= cd.date and cv.location= cd.location
- group by cv.location, cd.population)t
- order by 4 desc
+( SELECT cv.location, cd.population, max(cv.people_vaccinated) as
+  PeopleVaccinated
+  FROM project_portfolio.covid_vaccinations cv join project_portfolio.covid_deaths cd on cv.date= cd.date and cv.location= cd.location
+  group by cv.location, cd.population) t
+order by 4 desc
  
 
 
